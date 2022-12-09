@@ -9,6 +9,7 @@ class MealItem extends StatelessWidget {
   final int duration;
   final Complexity complexity;
   final Affordability affordability;
+  final Function removeItem;
 
   const MealItem({
     @required this.title,
@@ -17,48 +18,59 @@ class MealItem extends StatelessWidget {
     @required this.complexity,
     @required this.affordability,
     @required this.id,
+    @required this.removeItem,
   });
 
-  void selectMeal(BuildContext ctx) {
-    Navigator.of(ctx).pushNamed(DetailScreen.routeName, arguments: id);
-  }
-
-  String get complextityText {
+  String get complexityText {
     switch (complexity) {
       case Complexity.Simple:
         return 'Simple';
         break;
       case Complexity.Challenging:
-        return 'Challanging';
+        return 'Challenging';
         break;
       case Complexity.Hard:
         return 'Hard';
         break;
       default:
-        'unknown';
+        return 'Unknown';
     }
   }
 
-  String get afordabilityText {
+  String get affordabilityText {
     switch (affordability) {
       case Affordability.Affordable:
         return 'Affordable';
         break;
-      case Affordability.Luxurious:
-        return 'Luxurious';
-        break;
       case Affordability.Pricey:
-        return 'Up There';
+        return 'Pricey';
+        break;
+      case Affordability.Luxurious:
+        return 'Expensive';
         break;
       default:
-        'unknown';
+        return 'Unknown';
     }
+  }
+
+  void selectMeal(BuildContext context) {
+    Navigator.of(context)
+        .pushNamed(
+      DetailScreen.routeName,
+      arguments: id,
+    )
+        .then((value) {
+      print(value);
+      if (value != null) {
+        removeItem(value);
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (() => selectMeal(context)),
+      onTap: () => selectMeal(context),
       child: Card(
         elevation: 4,
         margin: const EdgeInsets.all(10),
@@ -118,18 +130,18 @@ class MealItem extends StatelessWidget {
                       const SizedBox(
                         width: 6,
                       ),
-                      Text('${duration} mins'),
+                      Text('$duration min'),
                     ],
                   ),
                   Row(
                     children: [
                       const Icon(
-                        Icons.ad_units,
+                        Icons.work,
                       ),
                       const SizedBox(
                         width: 6,
                       ),
-                      Text(complextityText),
+                      Text(complexityText),
                     ],
                   ),
                   Row(
@@ -140,7 +152,7 @@ class MealItem extends StatelessWidget {
                       const SizedBox(
                         width: 6,
                       ),
-                      Text(afordabilityText),
+                      Text(affordabilityText),
                     ],
                   ),
                 ],

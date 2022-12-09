@@ -1,26 +1,58 @@
 import 'package:flutter/material.dart';
-import '../dummy_data.dart';
+
+import '../models/meal.dart';
 import '../widgets/meal_item.dart';
 
-class CategoryMealsScreen extends StatelessWidget {
+class CategoryMealsScreen extends StatefulWidget {
   static const routeName = '/categories-meals';
-  // final String categoryId;
-  // final String categoryTitle;
 
-  // const CategoryMealsScreen(this.categoryId, this.categoryTitle);
+  final List<Meal> availableMeals;
+
+  CategoryMealsScreen(this.availableMeals);
 
   @override
+  State<CategoryMealsScreen> createState() => _CategoryMealsScreenState();
+}
+
+class _CategoryMealsScreenState extends State<CategoryMealsScreen> {
+  String categoryTitle;
+  List<Meal> displMeals;
+  bool _loadedInitData = false;
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    if (!_loadedInitData) {
+      super.didChangeDependencies();
+      final routeArgs =
+          ModalRoute.of(context).settings.arguments as Map<String, String>;
+      categoryTitle = routeArgs['title'];
+      final categoryId = routeArgs['id'];
+
+      // get the list of meals that include the categoryId in the list of associated IDs
+      displMeals = widget.availableMeals.where((meal) {
+        return meal.categories.contains(categoryId);
+      }).toList();
+      _loadedInitData = true;
+    }
+  }
+
+  void _removeMeal(mealId) {
+    print('remove this meal, ${mealId}');
+    setState(() {
+      displMeals.removeWhere(
+        (element) => (element.id == mealId),
+      );
+    });
+  }
+
+  // final String categoryId;
+  @override
   Widget build(BuildContext context) {
-    final routeArgs =
-        ModalRoute.of(context).settings.arguments as Map<String, String>;
-    final categoryTitle = routeArgs['title'];
-    final categoryId = routeArgs['id'];
-
-    // get the list of meals that include the categoryId in the list of associated IDs
-    final displMeals = DUMMY_MEALS.where((meal) {
-      return meal.categories.contains(categoryId);
-    }).toList();
-
     return Scaffold(
       appBar: AppBar(
         title: Text(categoryTitle),
@@ -34,6 +66,7 @@ class CategoryMealsScreen extends StatelessWidget {
             duration: displMeals[index].duration,
             imageUrl: displMeals[index].imageUrl,
             title: displMeals[index].title,
+            removeItem: _removeMeal,
           );
         }),
         itemCount: displMeals.length,
